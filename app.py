@@ -4,7 +4,7 @@ import torch.nn as nn
 import numpy as np
 import joblib
 
-# Define the same model architecture
+# Define the same model architecture (Must match the saved model)
 class HousePriceModel(nn.Module):
     def __init__(self):
         super(HousePriceModel, self).__init__()
@@ -18,12 +18,15 @@ class HousePriceModel(nn.Module):
         x = self.fc3(x)
         return x
 
-# Load trained model
+# Initialize model with the correct architecture
 model = HousePriceModel()
-model.load_state_dict(torch.load("model.pth", map_location=torch.device("cpu")))
+
+# Load only the state_dict
+MODEL_PATH = "model.pth"
+model.load_state_dict(torch.load(MODEL_PATH, map_location=torch.device("cpu")))
 model.eval()  # Set model to evaluation mode
 
-# Load the scaler
+# Load the scaler for preprocessing
 scaler = joblib.load("scaler.pkl")
 
 # Streamlit UI
