@@ -2,7 +2,7 @@ import streamlit as st
 import torch
 import torch.nn as nn
 import numpy as np
-from sklearn.preprocessing import StandardScaler
+import joblib
 
 # Define the same model architecture
 class HousePriceModel(nn.Module):
@@ -21,7 +21,10 @@ class HousePriceModel(nn.Module):
 # Load trained model
 model = HousePriceModel()
 model.load_state_dict(torch.load("model.pth", map_location=torch.device("cpu")))
-model.eval()  # Set to evaluation mode
+model.eval()  # Set model to evaluation mode
+
+# Load the scaler
+scaler = joblib.load("scaler.pkl")
 
 # Streamlit UI
 st.title("🏡 House Price Prediction")
@@ -38,9 +41,8 @@ GarageCars = st.number_input("Garage Capacity (Cars)", value=2)
 # Prepare input data
 input_data = np.array([[LotArea, YearBuilt, OverallQual, TotalBsmtSF, GrLivArea, GarageCars]], dtype=np.float32)
 
-# Normalize using pre-saved scaler values (use the same scaling as training)
-scaler = StandardScaler()
-input_data_scaled = scaler.fit_transform(input_data)
+# Normalize using pre-saved scaler
+input_data_scaled = scaler.transform(input_data)
 
 # Convert to tensor
 input_tensor = torch.tensor(input_data_scaled, dtype=torch.float32)
@@ -50,5 +52,3 @@ if st.button("Predict Price"):
     with torch.no_grad():
         predicted_price = model(input_tensor).item()
     st.success(f"Predicted House Price: ${predicted_price:,.2f}")
-
-
