@@ -7,16 +7,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import joblib
 
-# Load dataset (Ames Housing dataset example)
-df = pd.read_csv("C:\Users\pavan\OneDrive\Desktop\NEU\Pavan\EAI6010\Datasets")  # Ensure the dataset file is present
+# Load dataset
+dataset_path = "AmesHousing.csv"  # Ensure the correct file path
 df = pd.read_csv(dataset_path)
 
 # Selecting relevant numerical features
-features = ["Lot.Area", "Year.Built", "Overall.Qual", "Total.Bsmt.SF", "Gr.Liv.Area", "Garage.Cars"]
+features = ["LotArea", "YearBuilt", "OverallQual", "TotalBsmtSF", "GrLivArea", "GarageCars"]
 target = "SalePrice"
-
-# Ensure column names match the dataset (check if necessary)
-df.columns = df.columns.str.replace(" ", "_")  # Replace spaces with underscores if needed
 
 # Extract features and target
 X = df[features].values
@@ -30,7 +27,7 @@ scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
-# Save the scaler (needed for Streamlit deployment)
+# Save the scaler for consistent preprocessing
 joblib.dump(scaler, "scaler.pkl")
 
 # Convert data to PyTorch tensors
@@ -71,7 +68,8 @@ for epoch in range(epochs):
     if (epoch + 1) % 10 == 0:
         print(f"Epoch [{epoch+1}/{epochs}], Loss: {loss.item():.4f}")
 
-# Save only model state_dict
+# Save only the state_dict (Fixing Unpickling Error)
 torch.save(model.state_dict(), "model.pth")
 
-print("Model saved as model.pth")
+print("Model saved correctly as model.pth")
+
