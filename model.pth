@@ -5,18 +5,24 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+import joblib
 
 # Load dataset (Ames Housing dataset example)
-df = pd.read_csv("ames_housing.csv")  # Ensure the dataset file is present
+df = pd.read_csv("C:\Users\pavan\OneDrive\Desktop\NEU\Pavan\EAI6010\Datasets")  # Ensure the dataset file is present
+df = pd.read_csv(dataset_path)
 
-# Selecting important numerical features for regression
-features = ["LotArea", "YearBuilt", "OverallQual", "TotalBsmtSF", "GrLivArea", "GarageCars"]
+# Selecting relevant numerical features
+features = ["Lot.Area", "Year.Built", "Overall.Qual", "Total.Bsmt.SF", "Gr.Liv.Area", "Garage.Cars"]
 target = "SalePrice"
 
+# Ensure column names match the dataset (check if necessary)
+df.columns = df.columns.str.replace(" ", "_")  # Replace spaces with underscores if needed
+
+# Extract features and target
 X = df[features].values
 y = df[target].values.reshape(-1, 1)
 
-# Splitting data
+# Split data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Standardizing features
@@ -24,11 +30,12 @@ scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
+# Save the scaler (needed for Streamlit deployment)
+joblib.dump(scaler, "scaler.pkl")
+
 # Convert data to PyTorch tensors
 X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
 y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
-X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
-y_test_tensor = torch.tensor(y_test, dtype=torch.float32)
 
 # Define the model
 class HousePriceModel(nn.Module):
